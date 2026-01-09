@@ -1,5 +1,6 @@
 const { pool } = require('../db/pool');
 const { validationResult } = require('express-validator');
+const metricsService = require('../services/metricsService');
 
 const createCalculation = async (req, res) => {
   try {
@@ -29,7 +30,6 @@ const createCalculation = async (req, res) => {
       total_volume,
     } = req.body;
 
-    // For guest users, user_id will be null
     const userId = req.user ? req.user.id : null;
     console.log(`💾 Saving calculation for user_id: ${userId || 'NULL (guest)'}`);
 
@@ -65,6 +65,9 @@ const createCalculation = async (req, res) => {
 
     console.log('✅ Calculation saved:', result.rows[0].id);
     
+    await metricsService.recordCalculation(!!userId);
+    await metricsService.recordActivity(userId, 'calculation', !userId);
+    
     res.status(201).json({
       message: userId ? 'Calculation saved successfully' : 'Calculation processed (not saved - guest mode)',
       calculation: result.rows[0],
@@ -77,11 +80,12 @@ const createCalculation = async (req, res) => {
 };
 
 const getCalculations = async (req, res) => {
+  const startTime = Date.now();
+  
   try {
     console.log('📋 Get calculations request');
     console.log('User:', req.user ? `ID ${req.user.id}` : 'Guest');
     
-    // Guest users cannot retrieve history
     if (!req.user) {
       console.log('⚠️  Guest user - returning empty history');
       return res.json({ 
@@ -106,7 +110,6 @@ const getCalculations = async (req, res) => {
       console.log('📅 Sample timestamp from DB:', result.rows[0].created_at, 'Type:', typeof result.rows[0].created_at);
     }
 
-    // Transform database rows to match frontend format
     const calculations = result.rows.map((row) => ({
       id: row.id.toString(),
       timestamp: row.created_at ? row.created_at.toISOString() : new Date().toISOString(),
@@ -144,6 +147,11 @@ const getCalculations = async (req, res) => {
       },
     }));
 
+    const duration = Date.now() - startTime;
+    await metricsService.recordPerformance(req.user.id, 'history_load', duration);
+    await metricsService.recordActivity(req.user.id, 'history_view', false);
+    console.log(`⏱️  History load took ${duration}ms`);
+    
     res.json({ calculations });
   } catch (error) {
     console.error('Get calculations error:', error);
@@ -155,7 +163,6 @@ const deleteCalculation = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Verify calculation belongs to user
     const checkResult = await pool.query(
       'SELECT id FROM calculations WHERE id = $1 AND user_id = $2',
       [id, req.user.id]

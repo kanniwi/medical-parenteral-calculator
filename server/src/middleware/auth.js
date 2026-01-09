@@ -1,11 +1,10 @@
 const jwt = require('jsonwebtoken');
 const { pool } = require('../db/pool');
 
-// Strict authentication - requires valid token
 const authenticateToken = async (req, res, next) => {
   try {
     const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+    const token = authHeader && authHeader.split(' ')[1];
 
     if (!token) {
       return res.status(401).json({ error: 'Access token required' });
@@ -13,7 +12,6 @@ const authenticateToken = async (req, res, next) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
-    // Verify user still exists
     const userResult = await pool.query('SELECT id, email, name FROM users WHERE id = $1', [
       decoded.userId,
     ]);
@@ -35,14 +33,12 @@ const authenticateToken = async (req, res, next) => {
   }
 };
 
-// Optional authentication - allows guest users
 const optionalAuth = async (req, res, next) => {
   try {
     console.log(' optionalAuth middleware');
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      // No token provided - guest mode
       console.log('  No auth header - guest mode');
       req.user = null;
       return next();
@@ -55,13 +51,11 @@ const optionalAuth = async (req, res, next) => {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       console.log(' Token verified, userId:', decoded.userId);
 
-      // Verify user still exists
       const userResult = await pool.query('SELECT id, email, name FROM users WHERE id = $1', [
         decoded.userId,
       ]);
 
       if (userResult.rows.length === 0) {
-        // User not found - treat as guest
         console.log(' User not found in DB - guest mode');
         req.user = null;
         return next();
@@ -71,7 +65,6 @@ const optionalAuth = async (req, res, next) => {
       console.log(' User authenticated:', req.user.email);
       next();
     } catch (error) {
-      // Invalid or expired token - treat as guest
       console.log(' Token verification failed:', error.message);
       req.user = null;
       next();

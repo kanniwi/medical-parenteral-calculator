@@ -93,7 +93,7 @@ export default function LoginScreen() {
               onPress={handleLogin}
               disabled={loading}
               activeOpacity={0.8}>
-              <ThemedText style={styles.buttonText} lightColor="#FFFFFF" darkColor="#FFFFFF">
+              <ThemedText style={styles.buttonText} lightColor="#FFFFFF" darkColor="#000000">
                 {loading ? 'Вход...' : 'Войти'}
               </ThemedText>
             </TouchableOpacity>

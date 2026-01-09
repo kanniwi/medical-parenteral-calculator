@@ -24,16 +24,13 @@ export default function ProfileScreen() {
         setUser(storedUser);
         setIsGuest(false);
         
-        // Попробовать обновить данные с сервера
         try {
           const response = await authAPI.getProfile();
           setUser(response.user);
         } catch (_error) {
-          // Не удалось обновить с сервера, но у нас есть локальные данные
           console.log('Using cached user data');
         }
       } else {
-        // Нет сохраненного пользователя - гостевой режим
         setIsGuest(true);
       }
     } catch (_error) {
@@ -61,7 +58,6 @@ export default function ProfileScreen() {
           await authAPI.logout();
           setUser(null);
           setIsGuest(true);
-          // Stay on profile screen in guest mode instead of redirecting
         },
       },
     ]);

@@ -111,7 +111,7 @@ export default function RegisterScreen() {
               onPress={handleRegister}
               disabled={loading}
               activeOpacity={0.8}>
-              <ThemedText style={styles.buttonText} lightColor="#FFFFFF" darkColor="#FFFFFF">
+              <ThemedText style={styles.buttonText} lightColor="#FFFFFF" darkColor="#000000">
                 {loading ? 'Регистрация...' : 'Зарегистрироваться'}
               </ThemedText>
             </TouchableOpacity>

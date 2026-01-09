@@ -1,62 +1,176 @@
-# Калькулятор калорийности парентерального питания
+MedicalParenteralCalculatorёпддерж гевгржиасихицанных📊 ёглюкозы, миокист лпидов👤Ргистрацияавоизяльзателей🔄 инозацияёмежду устйтваи
+- 👥 Гсврежм (рабта без егистр)
+-📈Сохрнение истрииёовя заргсрированпольовт
+-📱 Пддежка iOS  Android###Frnn (Mobil App
+-
+- Expo
+- TypeScrip
+- Exo Route (fil-bsed rouig)
 
-Мобильное приложение для расчета калорийности парентерального питания. Позволяет рассчитать общую калорийность на основе объемов и концентраций компонентов: глюкозы, аминокислот и липидов.
+### Bckn (Srer
+- Nodejs-Exprss
+-PogSQL-JWT Autheiction
+-Система метрик
 
-## Возможности
+## Установка
 
-- Расчет калорийности парентерального питания
-- Ввод объемов и концентраций компонентов
-- Сохранение истории расчетов
-- Просмотр детальной информации о каждом расчете
-- Удаление отдельных записей или всей истории
+### Требования
+- No.js 18+
+- PostgrSQL 14+
+- pm или yar-ExpoCLI
 
-## Технологии
+###Backend
 
-Это приложение создано с использованием [Expo](https://expo.dev) и [React Native](https://reactnative.dev).
+cdserver
 
-## Get started
+#Установказависимостей
 
-1. Install dependencies
+#Настройкапеременныхокруженияcp env.example .env# Отредактируйте envфайл с вашими настройками
 
-   ```bash
-   npm install
-   ```
+# Создание таблиц БД
+npm unmigra
 
-2. Start the app
+#Создание таблиц метрик (опционально)
+npm run migrte:metrics
 
-   ```bash
-   npx expo start
-   ```
+# Запуск сервера
+nm run dev```
+Серверзапуститсянаhttp://localhost:3000
 
-In the output, you'll find options to open the app in a
+### Mobile App
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+``#Установказависимостей
+npmistall
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+# Запуск в режиме разработки
+n**Важно:**Обновите`ils/ai.s`:
+- Замените IP адрес на IP вашего компьютера в локальной сети
+- Для эмулятора/симулятора используйте соответствующий адрес
 
-## Get a fresh project
+##Конфигурация
 
-When you're ready, run:
+###Backe (.env)
 
-```bash
-npm run reset-project
+```env
+#Database
+DB_HOST=lcalht
+DB_PORT=5432
+DB_NAME=calcular_db
+DB_USER=osgrs
+DB_PASSWORD=your_ssword#Srr
+PORT=3000
+
+# JWT
+JWT_SECRET=yur_secr_key
+JWT_EXPIRES_IN=7d
+
+# CORSукажите IP вашего компьютера)
+CORS_ORIGIN=lalhot:8081,://192.168.1.100:8081
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### Mbil A (uap.ts)
 
-## Learn more
+```ypescipt
+st API_BASE_URL = __DEV__ ?'192.1681100:3000p'  / Замените на IP вашего компьютера :'yur-ruction-sre.cmapi';
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+## Структура проекта
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```
+medcal-parenteralcalc├── app/                    # Mobile app(Ruter)
+│   ├── aut)/            # Экраны авторизации
+│   ├── (ab)            # Основные экраны (tabs naiatin
+│  └──_ayout.        #Rotla
+├──cmons/           #КомпонентыReatNi
+├── utis/                # Утилиты и API клиент
+├── tyes/                #TpScrp типы
+├──servr/               #Back
+│ ├──sc/
+│   │   ├── onrlles/  # Контроллеры API
+│   │  ├──u/       # API маршруты
+│   │   ├──mddwr/   # Midleware(a, e)
+│   │   ├── srices     # Сервисы (mtics)
+│   │   └── db          # База данных (pool, mgas, schema
+│   └── env             # Конфигурация сервера└── README.md```
 
-## Join the community
+APIEndins### Autticatin
+- `POST /api/ath/gist` - Регистрация- POST /i/ath/logi` Вход
+- `GET /ai/auth/pfil` - Получить профиль (требует auh)###Calultios
+-`POST /ap/cacuatins`-Создать расчёт (опциональная uh)
+-`GET/api/calculains`- Получить историю (требует au)
+-`DELETE /i/culais/:i`- Удалить расчёт (требует uh)
+-`DELETE//alculains` - Очиститьвсюисторию(требуетuh)#Mtics (требуетauth)- `GE/api/mtrics/summy` - Общая сводка метрик
+- `GET/api/etics/ci-ses` - Активные пользователи за час
+- `GET/ai/metics/calulaions` - Статистикарасчётов
+-`GT/pi/merics/prrmace` - Метрики производительности
+- `POST/api/metic/lanup` - Очистить старые метрики
 
-Join our community of developers creating universal apps.
+## База данных
+### Основные таблицы- `users` Пользователи
+-`calls` - История расчётов
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+### Метрики опционально
+-`clclatio_ric` - Метрики расчётовпочасам
+-`perfrme_mr` - Производительностьопераций
+-`se_actvity` - Активность пользователей
+
+## Разработка
+
+### Запуск сервера в v режиме
+
+```ba
+d rer
+npm rn v```
+
+###Запуск мобильного приложения
+
+```bsh
+pxesart
+```
+
+Затем:
+- Нажмите `i` для iOS simla
+- Нажмите `` для Anri mla
+- Сканируйте QR код в Expo Go для физического устройства
+
+## Гостевой режим
+
+Приложение поддерживает работу без регистрации:
+- ✅ Все расчёты доступны
+- ❌ История не сохраняется
+- 💡 Для сохранения истории требуется регистрация
+
+## Сборка для p
+
+###Bcknd
+
+```ah
+cd srver
+nmst
+```
+
+###MbiApp
+
+```bsh
+#Andid
+sbild--platfrma
+
+#
+esuld--plafr os
+```##Tbhoo
+
+###Ntwork Erro вприложении- Убедитесь что сервер запущен Проверьте IPадресв`ilap.s`
+- Обновите `CORS_ORIGIN` в `servr.nv`
+
+### База данных не подключается
+-ПроверьтечтоPtgSQLзапущен
+-Проверьтеredeials в `sevr/env` Запуститемиграции:`np r mgr`
+
+### История не загружается
+- Убедитесь что пользователь авторизован
+- Проверьтечтотокенвалиден
+-Проверьтелогисервера
+
+##Lice
+
+MIT

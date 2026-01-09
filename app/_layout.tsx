@@ -23,17 +23,23 @@ export default function RootLayout() {
   }, []);
 
   useEffect(() => {
-    if (isLoading || isAuthenticated === null) return;
+    const handleNavigation = async () => {
+      if (isLoading) return;
 
-    const inAuthGroup = segments[0] === '(auth)';
+      const inAuthGroup = segments[0] === '(auth)';
+      
+      if (inAuthGroup) {
+        const currentAuth = await authAPI.isAuthenticated();
+        setIsAuthenticated(currentAuth);
+        
+        if (currentAuth) {
+          router.replace('/(tabs)');
+        }
+      }
+    };
 
-    // If authenticated and in auth screens, redirect to tabs
-    if (isAuthenticated && inAuthGroup) {
-      router.replace('/(tabs)');
-    }
-    // Guest mode: Allow access to tabs without authentication
-    // User can navigate to auth screens manually if they want to login
-  }, [isAuthenticated, segments, isLoading, router]);
+    handleNavigation();
+  }, [segments, isLoading, router]);
 
   const checkAuth = async () => {
     try {

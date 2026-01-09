@@ -31,7 +31,6 @@ export default function HistoryScreen() {
       setHistory(data);
     } catch (error: any) {
       if (error.response?.status === 401) {
-        // Токен истек, перенаправляем на логин
         await authAPI.logout();
         router.replace('/(auth)/login');
       } else {
