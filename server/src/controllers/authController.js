@@ -5,8 +5,11 @@ const { validationResult } = require('express-validator');
 
 const register = async (req, res) => {
   try {
+    console.log('📝 Registration attempt:', { email: req.body.email, name: req.body.name });
+    
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('❌ Validation errors:', errors.array());
       return res.status(400).json({ errors: errors.array() });
     }
 
@@ -15,12 +18,14 @@ const register = async (req, res) => {
     // Check if user already exists
     const existingUser = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
     if (existingUser.rows.length > 0) {
+      console.log('❌ User already exists:', email);
       return res.status(400).json({ error: 'User with this email already exists' });
     }
 
     // Hash password
     const saltRounds = 10;
     const passwordHash = await bcrypt.hash(password, saltRounds);
+    console.log('🔐 Password hashed');
 
     // Create user
     const result = await pool.query(
@@ -29,6 +34,7 @@ const register = async (req, res) => {
     );
 
     const user = result.rows[0];
+    console.log('✅ User created:', { id: user.id, email: user.email });
 
     // Generate JWT token
     const token = jwt.sign(
@@ -36,7 +42,9 @@ const register = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
     );
+    console.log('🎫 Token generated');
 
+    console.log('✅ Registration successful for:', email);
     res.status(201).json({
       message: 'User registered successfully',
       token,
@@ -47,8 +55,8 @@ const register = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error('Registration error:', error);
-    res.status(500).json({ error: 'Registration failed' });
+    console.error('❌ Registration error:', error);
+    res.status(500).json({ error: 'Registration failed', details: error.message });
   }
 };
 

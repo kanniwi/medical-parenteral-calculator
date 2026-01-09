@@ -1,9 +1,8 @@
-import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
-// Измените этот URL на адрес вашего сервера
 const API_BASE_URL = __DEV__
-  ? 'http://localhost:3000/api'
+  ? 'http://172.20.10.2:3000/api'  
   : 'https://your-production-server.com/api';
 
 const api = axios.create({
