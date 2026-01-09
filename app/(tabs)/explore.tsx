@@ -1,112 +1,292 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
-
-import { Collapsible } from '@/components/ui/collapsible';
-import { ExternalLink } from '@/components/external-link';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
+import React, { useState, useEffect } from 'react';
+import {
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  RefreshControl,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Fonts } from '@/constants/theme';
+import { calculationsAPI, authAPI } from '@/utils/api';
+import { CalculationHistory } from '@/types/nutrition';
+import { router } from 'expo-router';
+import { useThemeColor } from '@/hooks/use-theme-color';
 
-export default function TabTwoScreen() {
+export default function HistoryScreen() {
+  const [history, setHistory] = useState<CalculationHistory[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
+  const tintColor = useThemeColor({}, 'tint');
+  const borderColor = useThemeColor({}, 'icon');
+
+  useEffect(() => {
+    loadHistory();
+  }, []);
+
+  const loadHistory = async () => {
+    try {
+      const data = await calculationsAPI.getAll();
+      setHistory(data);
+    } catch (error: any) {
+      if (error.response?.status === 401) {
+        // Токен истек, перенаправляем на логин
+        await authAPI.logout();
+        router.replace('/(auth)/login');
+      } else {
+        console.error('Load history error:', error);
+        Alert.alert('Ошибка', 'Не удалось загрузить историю');
+      }
+    }
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await loadHistory();
+    setRefreshing(false);
+  };
+
+  const handleClearHistory = () => {
+    Alert.alert('Очистить историю', 'Вы уверены, что хотите удалить всю историю?', [
+      { text: 'Отмена', style: 'cancel' },
+      {
+        text: 'Удалить',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await calculationsAPI.clearAll();
+            await loadHistory();
+          } catch (error: any) {
+            Alert.alert('Ошибка', 'Не удалось очистить историю');
+            console.error('Clear history error:', error);
+          }
+        },
+      },
+    ]);
+  };
+
+  const handleDeleteItem = (id: string) => {
+    Alert.alert('Удалить запись', 'Вы уверены, что хотите удалить эту запись?', [
+      { text: 'Отмена', style: 'cancel' },
+      {
+        text: 'Удалить',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await calculationsAPI.delete(id);
+            await loadHistory();
+          } catch (error: any) {
+            Alert.alert('Ошибка', 'Не удалось удалить запись');
+            console.error('Delete calculation error:', error);
+          }
+        },
+      },
+    ]);
+  };
+
+  const formatDate = (date: Date) => {
+    return new Intl.DateTimeFormat('ru-RU', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(date);
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-      headerImage={
-        <IconSymbol
-          size={310}
-          color="#808080"
-          name="chevron.left.forwardslash.chevron.right"
-          style={styles.headerImage}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText
-          type="title"
-          style={{
-            fontFamily: Fonts.rounded,
-          }}>
-          Explore
-        </ThemedText>
-      </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
-      <Collapsible title="File-based routing">
-        <ThemedText>
-          This app has two screens:{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
-        </ThemedText>
-        <ThemedText>
-          The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-          sets up the tab navigator.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Android, iOS, and web support">
-        <ThemedText>
-          You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-          <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-        </ThemedText>
-      </Collapsible>
-      <Collapsible title="Images">
-        <ThemedText>
-          For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-          different screen densities
-        </ThemedText>
-        <Image
-          source={require('@/assets/images/react-logo.png')}
-          style={{ width: 100, height: 100, alignSelf: 'center' }}
-        />
-        <ExternalLink href="https://reactnative.dev/docs/images">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Light and dark mode components">
-        <ThemedText>
-          This template has light and dark mode support. The{' '}
-          <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-          what the user&apos;s current color scheme is, and so you can adjust UI colors accordingly.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Animations">
-        <ThemedText>
-          This template includes an example of an animated component. The{' '}
-          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-          the powerful{' '}
-          <ThemedText type="defaultSemiBold" style={{ fontFamily: Fonts.mono }}>
-            react-native-reanimated
-          </ThemedText>{' '}
-          library to create a waving hand animation.
-        </ThemedText>
-        {Platform.select({
-          ios: (
-            <ThemedText>
-              The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-              component provides a parallax effect for the header image.
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <ThemedView style={styles.container}>
+        <ThemedView style={styles.header}>
+          <ThemedText type="title" style={styles.title}>
+            История расчетов
+          </ThemedText>
+          {history.length > 0 && (
+            <TouchableOpacity
+              style={[styles.clearButton, { borderColor: tintColor }]}
+              onPress={handleClearHistory}
+              activeOpacity={0.7}>
+              <ThemedText style={[styles.clearButtonText, { color: tintColor }]}>
+                Очистить
+              </ThemedText>
+            </TouchableOpacity>
+          )}
+        </ThemedView>
+
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        showsVerticalScrollIndicator={false}>
+        {history.length === 0 ? (
+          <ThemedView style={styles.emptyContainer}>
+            <ThemedText style={styles.emptyText}>
+              История расчетов пуста{'\n'}Выполните расчет на главном экране
             </ThemedText>
-          ),
-        })}
-      </Collapsible>
-    </ParallaxScrollView>
+          </ThemedView>
+        ) : (
+          history.map((item) => (
+            <ThemedView
+              key={item.id}
+              style={[styles.historyItem, { borderColor: borderColor }]}>
+              <ThemedView style={styles.historyHeader}>
+                <ThemedText style={styles.historyDate}>{formatDate(item.timestamp)}</ThemedText>
+                <TouchableOpacity onPress={() => handleDeleteItem(item.id)}>
+                  <ThemedText style={[styles.deleteButton, { color: '#FF3B30' }]}>
+                    ✕
+                  </ThemedText>
+                </TouchableOpacity>
+              </ThemedView>
+
+              <ThemedView style={styles.historyContent}>
+                <ThemedText style={styles.historyTotal}>
+                  {item.result.total.calories} ккал
+                </ThemedText>
+                <ThemedText style={styles.historyVolume}>
+                  Объем: {item.result.total.volume} мл
+                </ThemedText>
+
+                <ThemedView style={styles.historyDetails}>
+                  <ThemedText style={styles.historyDetail}>
+                    Глюкоза: {item.result.glucose.grams} г ({item.result.glucose.calories} ккал)
+                  </ThemedText>
+                  <ThemedText style={styles.historyDetail}>
+                    Аминокислоты: {item.result.aminoAcids.grams} г (
+                    {item.result.aminoAcids.calories} ккал)
+                  </ThemedText>
+                  <ThemedText style={styles.historyDetail}>
+                    Липиды: {item.result.lipids.grams} г ({item.result.lipids.calories} ккал)
+                  </ThemedText>
+                </ThemedView>
+
+                <ThemedView style={styles.historyInput}>
+                  <ThemedText style={styles.historyInputLabel}>Входные данные:</ThemedText>
+                  <ThemedText style={styles.historyInputText}>
+                    Глюкоза: {item.input.glucose.volume} мл, {item.input.glucose.concentration}%
+                  </ThemedText>
+                  <ThemedText style={styles.historyInputText}>
+                    Аминокислоты: {item.input.aminoAcids.volume} мл,{' '}
+                    {item.input.aminoAcids.concentration}%
+                  </ThemedText>
+                  <ThemedText style={styles.historyInputText}>
+                    Липиды: {item.input.lipids.volume} мл, {item.input.lipids.concentration}%
+                  </ThemedText>
+                </ThemedView>
+              </ThemedView>
+            </ThemedView>
+          ))
+        )}
+      </ScrollView>
+      </ThemedView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
+  safeArea: {
+    flex: 1,
   },
-  titleContainer: {
+  container: {
+    flex: 1,
+  },
+  header: {
+    padding: 20,
+    paddingTop: 16,
+    paddingBottom: 10,
     flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  title: {
+    flex: 1,
+  },
+  clearButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+  },
+  clearButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    padding: 20,
+    paddingTop: 10,
+    paddingBottom: 40,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 60,
+  },
+  emptyText: {
+    textAlign: 'center',
+    opacity: 0.6,
+    fontSize: 16,
+  },
+  historyItem: {
+    marginBottom: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    padding: 16,
+  },
+  historyHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E0E0E0',
+  },
+  historyDate: {
+    fontSize: 14,
+    opacity: 0.7,
+  },
+  deleteButton: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    padding: 4,
+  },
+  historyContent: {
     gap: 8,
+  },
+  historyTotal: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#0a7ea4',
+  },
+  historyVolume: {
+    fontSize: 14,
+    opacity: 0.7,
+    marginBottom: 8,
+  },
+  historyDetails: {
+    gap: 4,
+    marginBottom: 12,
+  },
+  historyDetail: {
+    fontSize: 14,
+  },
+  historyInput: {
+    marginTop: 8,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#E0E0E0',
+  },
+  historyInputLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    opacity: 0.7,
+    marginBottom: 4,
+  },
+  historyInputText: {
+    fontSize: 12,
+    opacity: 0.6,
   },
 });
