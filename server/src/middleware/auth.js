@@ -38,36 +38,48 @@ const authenticateToken = async (req, res, next) => {
 // Optional authentication - allows guest users
 const optionalAuth = async (req, res, next) => {
   try {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
+    console.log(' optionalAuth middleware');
+    const authHeader = req.headers.authorization;
 
-    if (!token) {
-      // No token - continue as guest
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      // No token provided - guest mode
+      console.log('  No auth header - guest mode');
       req.user = null;
       return next();
     }
 
+    const token = authHeader.substring(7);
+    console.log(' Token found, length:', token.length);
+
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      
+      console.log(' Token verified, userId:', decoded.userId);
+
       // Verify user still exists
       const userResult = await pool.query('SELECT id, email, name FROM users WHERE id = $1', [
         decoded.userId,
       ]);
 
-      if (userResult.rows.length > 0) {
-        req.user = userResult.rows[0];
-      } else {
+      if (userResult.rows.length === 0) {
+        // User not found - treat as guest
+        console.log(' User not found in DB - guest mode');
         req.user = null;
+        return next();
       }
-    } catch (_error) {
-      // Invalid/expired token - continue as guest
-      req.user = null;
-    }
 
+      req.user = userResult.rows[0];
+      console.log(' User authenticated:', req.user.email);
+      next();
+    } catch (error) {
+      // Invalid or expired token - treat as guest
+      console.log(' Token verification failed:', error.message);
+      req.user = null;
+      next();
+    }
+  } catch (error) {
+    console.log(' optionalAuth error:', error.message);
+    req.user = null;
     next();
-  } catch (_err) {
-    return res.status(500).json({ error: 'Authentication error' });
   }
 };
 

@@ -23,14 +23,17 @@ export default function ProfileScreen() {
       if (storedUser) {
         setUser(storedUser);
         setIsGuest(false);
-      }
-      // Также можно загрузить свежие данные с сервера
-      try {
-        const response = await authAPI.getProfile();
-        setUser(response.user);
-        setIsGuest(false);
-      } catch (_error) {
-        // Если не удалось загрузить с сервера, пользователь в гостевом режиме
+        
+        // Попробовать обновить данные с сервера
+        try {
+          const response = await authAPI.getProfile();
+          setUser(response.user);
+        } catch (_error) {
+          // Не удалось обновить с сервера, но у нас есть локальные данные
+          console.log('Using cached user data');
+        }
+      } else {
+        // Нет сохраненного пользователя - гостевой режим
         setIsGuest(true);
       }
     } catch (_error) {
@@ -114,12 +117,6 @@ export default function ProfileScreen() {
                   Зарегистрироваться
                 </ThemedText>
               </TouchableOpacity>
-
-              <ThemedView style={styles.infoCard}>
-                <ThemedText style={styles.infoText}>
-                  💡 В гостевом режиме вы можете использовать калькулятор без ограничений, но расчеты не будут сохранены.
-                </ThemedText>
-              </ThemedView>
             </>
           ) : (
             <>
@@ -156,7 +153,7 @@ export default function ProfileScreen() {
 
               <ThemedView style={styles.infoCard}>
                 <ThemedText style={styles.infoText}>
-                  ✅ Все ваши расчеты сохраняются в базе данных и доступны на всех ваших устройствах.
+                  Все ваши расчеты сохраняются и доступны на всех ваших устройствах.
                 </ThemedText>
               </ThemedView>
             </>

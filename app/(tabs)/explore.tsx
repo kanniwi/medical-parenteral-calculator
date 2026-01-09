@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import { ThemedText } from '@/components/themed-text';
+import { ThemedView } from '@/components/themed-view';
+import { useThemeColor } from '@/hooks/use-theme-color';
+import { CalculationHistory } from '@/types/nutrition';
+import { authAPI, calculationsAPI } from '@/utils/api';
+import { router } from 'expo-router';
+import React, { useEffect, useState } from 'react';
 import {
+  Alert,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  Alert,
-  RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { calculationsAPI, authAPI } from '@/utils/api';
-import { CalculationHistory } from '@/types/nutrition';
-import { router } from 'expo-router';
-import { useThemeColor } from '@/hooks/use-theme-color';
 
 export default function HistoryScreen() {
   const [history, setHistory] = useState<CalculationHistory[]>([]);
@@ -27,6 +27,7 @@ export default function HistoryScreen() {
   const loadHistory = async () => {
     try {
       const data = await calculationsAPI.getAll();
+      console.log('📋 Loaded history data:', JSON.stringify(data, null, 2));
       setHistory(data);
     } catch (error: any) {
       if (error.response?.status === 401) {
@@ -84,14 +85,20 @@ export default function HistoryScreen() {
     ]);
   };
 
-  const formatDate = (date: Date) => {
+  const formatDate = (date: Date | string) => {
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    
+    if (isNaN(dateObj.getTime())) {
+      return 'Неверная дата';
+    }
+    
     return new Intl.DateTimeFormat('ru-RU', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
-    }).format(date);
+    }).format(dateObj);
   };
 
   return (
