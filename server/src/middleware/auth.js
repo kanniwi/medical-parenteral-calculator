@@ -35,42 +35,34 @@ const authenticateToken = async (req, res, next) => {
 
 const optionalAuth = async (req, res, next) => {
   try {
-    console.log(' optionalAuth middleware');
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      console.log('  No auth header - guest mode');
       req.user = null;
       return next();
     }
 
     const token = authHeader.substring(7);
-    console.log(' Token found, length:', token.length);
 
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      console.log(' Token verified, userId:', decoded.userId);
 
       const userResult = await pool.query('SELECT id, email, name FROM users WHERE id = $1', [
         decoded.userId,
       ]);
 
       if (userResult.rows.length === 0) {
-        console.log(' User not found in DB - guest mode');
         req.user = null;
         return next();
       }
 
       req.user = userResult.rows[0];
-      console.log(' User authenticated:', req.user.email);
       next();
-    } catch (error) {
-      console.log(' Token verification failed:', error.message);
+    } catch (_error) {
       req.user = null;
       next();
     }
-  } catch (error) {
-    console.log(' optionalAuth error:', error.message);
+  } catch (_error) {
     req.user = null;
     next();
   }

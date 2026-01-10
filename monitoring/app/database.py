@@ -21,9 +21,9 @@ _pool: asyncpg.Pool | None = None
 
 async def init_db():
     global _pool
-    print(f"🔌 Connecting to database: {DATABASE_URL}")
+    print(f"Connecting to database: {DATABASE_URL}")
     _pool = await asyncpg.create_pool(DATABASE_URL, min_size=1, max_size=5)
-    print(f"✅ Database connected successfully")
+    print(f"Database connected successfully")
 
 
 async def get_pool() -> asyncpg.Pool:

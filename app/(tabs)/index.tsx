@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
-import { ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
 import { NutritionInput } from '@/components/nutrition-input';
 import { ResultCard } from '@/components/result-card';
-import { calculateNutrition } from '@/utils/calculations';
-import { calculationsAPI } from '@/utils/api';
-import { ParenteralNutrition, NutritionCalculation } from '@/types/nutrition';
+import { ThemedText } from '@/components/themed-text';
+import { ThemedView } from '@/components/themed-view';
 import { useThemeColor } from '@/hooks/use-theme-color';
+import { NutritionCalculation, ParenteralNutrition } from '@/types/nutrition';
+import { calculationsAPI } from '@/utils/api';
+import { calculateNutrition } from '@/utils/calculations';
+import React, { useState } from 'react';
+import { Alert, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function CalculatorScreen() {
   const [glucoseVolume, setGlucoseVolume] = useState('');
@@ -98,8 +98,15 @@ export default function CalculatorScreen() {
         total_volume: calculation.total.volume,
       });
     } catch (error: any) {
-      Alert.alert('Ошибка', 'Не удалось сохранить расчет. Попробуйте снова.');
       console.error('Save calculation error:', error);
+      console.error('Error response:', error.response?.data);
+      console.error('Error status:', error.response?.status);
+      
+      const errorMessage = error.response?.data?.errors 
+        ? error.response.data.errors.map((e: any) => e.msg).join('\n')
+        : error.response?.data?.error || 'Не удалось сохранить расчет';
+      
+      Alert.alert('Ошибка сохранения', errorMessage);
     }
   };
 

@@ -12,9 +12,9 @@ const pool = new Pool({
 });
 
 async function migrateMetrics() {
-  console.log('🔄 Starting metrics tables migration...');
-
   try {
+    console.log('Starting metrics tables migration...');
+
     // Read the SQL schema file
     const schemaPath = path.join(__dirname, 'metrics_schema.sql');
     const schemaSql = fs.readFileSync(schemaPath, 'utf8');
@@ -22,11 +22,11 @@ async function migrateMetrics() {
     // Execute the schema
     await pool.query(schemaSql);
 
-    console.log('✅ Metrics tables created successfully');
-    console.log('✅ Indexes created');
-    console.log('✅ Views created');
-    console.log('✅ Functions created');
-    console.log('🎉 Metrics migration completed successfully!');
+    console.log('Metrics tables created successfully');
+    console.log('Indexes created');
+    console.log('Views created');
+    console.log('Functions created');
+    console.log('Metrics migration completed successfully!\n');
 
     // Verify tables exist
     const tableCheck = await pool.query(`
@@ -37,7 +37,7 @@ async function migrateMetrics() {
       ORDER BY table_name;
     `);
 
-    console.log('\n📊 Metrics tables created:');
+    console.log('Metrics tables created:');
     tableCheck.rows.forEach((row) => {
       console.log(`   - ${row.table_name}`);
     });
@@ -51,13 +51,13 @@ async function migrateMetrics() {
       ORDER BY table_name;
     `);
 
-    console.log('\n📈 Metrics views created:');
+    console.log('Metrics views created:');
     viewCheck.rows.forEach((row) => {
       console.log(`   - ${row.table_name}`);
     });
 
   } catch (error) {
-    console.error('❌ Migration failed:', error);
+    console.error('Metrics migration error:', error);
     throw error;
   } finally {
     await pool.end();
@@ -67,7 +67,7 @@ async function migrateMetrics() {
 // Run migration
 migrateMetrics()
   .then(() => {
-    console.log('\n✨ Metrics system is ready!');
+    console.log('\nMetrics system is ready!');
     process.exit(0);
   })
   .catch((error) => {

@@ -6,11 +6,8 @@ const metricsService = require('../services/metricsService');
 
 const register = async (req, res) => {
   try {
-    console.log('📝 Registration attempt:', { email: req.body.email, name: req.body.name });
-    
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      console.log('❌ Validation errors:', errors.array());
       return res.status(400).json({ errors: errors.array() });
     }
 
@@ -18,13 +15,11 @@ const register = async (req, res) => {
 
     const existingUser = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
     if (existingUser.rows.length > 0) {
-      console.log('❌ User already exists:', email);
       return res.status(400).json({ error: 'User with this email already exists' });
     }
 
     const saltRounds = 10;
     const passwordHash = await bcrypt.hash(password, saltRounds);
-    console.log('🔐 Password hashed');
 
     const result = await pool.query(
       'INSERT INTO users (email, password_hash, name) VALUES ($1, $2, $3) RETURNING id, email, name, created_at',
@@ -32,16 +27,12 @@ const register = async (req, res) => {
     );
 
     const user = result.rows[0];
-    console.log('✅ User created:', { id: user.id, email: user.email });
 
     const token = jwt.sign(
       { userId: user.id, email: user.email },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
     );
-    console.log('🎫 Token generated');
-
-    console.log('✅ Registration successful for:', email);
     
     await metricsService.recordActivity(user.id, 'register', false);
     
@@ -55,7 +46,7 @@ const register = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error('❌ Registration error:', error);
+    console.error('Registration error:', error);
     res.status(500).json({ error: 'Registration failed', details: error.message });
   }
 };

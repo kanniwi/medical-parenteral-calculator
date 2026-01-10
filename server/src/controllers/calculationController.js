@@ -4,12 +4,8 @@ const metricsService = require('../services/metricsService');
 
 const createCalculation = async (req, res) => {
   try {
-    console.log('📊 Create calculation request');
-    console.log('User:', req.user ? `ID ${req.user.id}` : 'Guest');
-    
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      console.log('❌ Validation errors:', errors.array());
       return res.status(400).json({ errors: errors.array() });
     }
 
@@ -31,7 +27,6 @@ const createCalculation = async (req, res) => {
     } = req.body;
 
     const userId = req.user ? req.user.id : null;
-    console.log(`💾 Saving calculation for user_id: ${userId || 'NULL (guest)'}`);
 
     const result = await pool.query(
       `INSERT INTO calculations (
@@ -62,8 +57,6 @@ const createCalculation = async (req, res) => {
         total_volume,
       ]
     );
-
-    console.log('✅ Calculation saved:', result.rows[0].id);
     
     await metricsService.recordCalculation(!!userId);
     await metricsService.recordActivity(userId, 'calculation', !userId);
@@ -74,7 +67,7 @@ const createCalculation = async (req, res) => {
       isGuest: !userId,
     });
   } catch (error) {
-    console.error('❌ Create calculation error:', error);
+    console.error('Create calculation error:', error);
     res.status(500).json({ error: 'Failed to save calculation', details: error.message });
   }
 };
@@ -83,18 +76,12 @@ const getCalculations = async (req, res) => {
   const startTime = Date.now();
   
   try {
-    console.log('📋 Get calculations request');
-    console.log('User:', req.user ? `ID ${req.user.id}` : 'Guest');
-    
     if (!req.user) {
-      console.log('⚠️  Guest user - returning empty history');
       return res.json({ 
         calculations: [],
         message: 'Login to save and view calculation history'
       });
     }
-
-    console.log(`🔍 Fetching calculations for user_id: ${req.user.id}`);
     
     const result = await pool.query(
       `SELECT * FROM calculations 
@@ -103,12 +90,6 @@ const getCalculations = async (req, res) => {
        LIMIT 50`,
       [req.user.id]
     );
-    
-    console.log(`✅ Found ${result.rows.length} calculations`);
-    
-    if (result.rows.length > 0) {
-      console.log('📅 Sample timestamp from DB:', result.rows[0].created_at, 'Type:', typeof result.rows[0].created_at);
-    }
 
     const calculations = result.rows.map((row) => ({
       id: row.id.toString(),
@@ -150,7 +131,6 @@ const getCalculations = async (req, res) => {
     const duration = Date.now() - startTime;
     await metricsService.recordPerformance(req.user.id, 'history_load', duration);
     await metricsService.recordActivity(req.user.id, 'history_view', false);
-    console.log(`⏱️  History load took ${duration}ms`);
     
     res.json({ calculations });
   } catch (error) {

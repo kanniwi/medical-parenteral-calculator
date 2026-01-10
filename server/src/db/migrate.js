@@ -2,7 +2,7 @@ const { pool } = require('./pool');
 
 async function migrate() {
   try {
-    console.log('🔄 Starting database migration...');
+    console.log('Starting database migration...');
 
     // Create users table
     await pool.query(`
@@ -15,7 +15,7 @@ async function migrate() {
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
-    console.log('✅ Users table created');
+    console.log('Users table created');
 
     // Create calculations table (user_id is nullable for guest mode)
     await pool.query(`
@@ -39,7 +39,7 @@ async function migrate() {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
-    console.log('✅ Calculations table created');
+    console.log('Calculations table created');
 
     // Create indexes
     await pool.query(`
@@ -51,7 +51,7 @@ async function migrate() {
     await pool.query(`
       CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
     `);
-    console.log('✅ Indexes created');
+    console.log('Indexes created');
 
     // Create trigger for updated_at
     await pool.query(`
@@ -69,13 +69,13 @@ async function migrate() {
       CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON users
           FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
     `);
-    console.log('✅ Triggers created');
+    console.log('Triggers created');
 
-    console.log('🎉 Database migration completed successfully!');
+    console.log('Database migration completed successfully!');
     await pool.end();
     process.exit(0);
   } catch (error) {
-    console.error('❌ Migration error:', error);
+    console.error('Migration error:', error);
     process.exit(1);
   }
 }

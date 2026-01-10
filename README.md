@@ -1,176 +1,299 @@
-MedicalParenteralCalculatorёпддерж гевгржиасихицанных📊 ёглюкозы, миокист лпидов👤Ргистрацияавоизяльзателей🔄 инозацияёмежду устйтваи
-- 👥 Гсврежм (рабта без егистр)
--📈Сохрнение истрииёовя заргсрированпольовт
--📱 Пддежка iOS  Android###Frnn (Mobil App
--
-- Expo
-- TypeScrip
-- Exo Route (fil-bsed rouig)
+# Medical Parenteral Calculator - Setup Guide
 
-### Bckn (Srer
-- Nodejs-Exprss
--PogSQL-JWT Autheiction
--Система метрик
+## Prerequisites
 
-## Установка
+- Node.js 18+
+- Python 3.10+ (for monitoring service)
+- PostgreSQL 14+
+- Docker Desktop (for Prometheus and Grafana)
+- Expo CLI
 
-### Требования
-- No.js 18+
-- PostgrSQL 14+
-- pm или yar-ExpoCLI
+## Quick Start
 
-###Backend
+### 1. Database Setup
 
-cdserver
+Ensure PostgreSQL is running on localhost:5432
 
-#Установказависимостей
+Create database:
+```bash
+createdb calculator_db
+```
 
-#Настройкапеременныхокруженияcp env.example .env# Отредактируйте envфайл с вашими настройками
+Or using psql:
+```sql
+CREATE DATABASE calculator_db;
+```
 
-# Создание таблиц БД
-npm unmigra
+### 2. Backend Server Setup
 
-#Создание таблиц метрик (опционально)
-npm run migrte:metrics
+Navigate to server directory:
+```bash
+cd server
+```
 
-# Запуск сервера
-nm run dev```
-Серверзапуститсянаhttp://localhost:3000
+Install dependencies:
+```bash
+npm install
+```
 
-### Mobile App
-
-``#Установказависимостей
-npmistall
-
-# Запуск в режиме разработки
-n**Важно:**Обновите`ils/ai.s`:
-- Замените IP адрес на IP вашего компьютера в локальной сети
-- Для эмулятора/симулятора используйте соответствующий адрес
-
-##Конфигурация
-
-###Backe (.env)
-
+Configure environment variables in `server/.env`:
 ```env
-#Database
-DB_HOST=lcalht
+DB_HOST=localhost
 DB_PORT=5432
-DB_NAME=calcular_db
-DB_USER=osgrs
-DB_PASSWORD=your_ssword#Srr
-PORT=3000
+DB_NAME=calculator_db
+DB_USER=postgres
+DB_PASSWORD=postgres
 
-# JWT
-JWT_SECRET=yur_secr_key
+PORT=3001
+NODE_ENV=development
+
+JWT_SECRET=medical_calculator_secret_key_2024_change_in_production
 JWT_EXPIRES_IN=7d
 
-# CORSукажите IP вашего компьютера)
-CORS_ORIGIN=lalhot:8081,://192.168.1.100:8081
+CORS_ORIGIN=http://localhost:8081,exp://172.20.10.2:8081
 ```
 
-### Mbil A (uap.ts)
-
-```ypescipt
-st API_BASE_URL = __DEV__ ?'192.1681100:3000p'  / Замените на IP вашего компьютера :'yur-ruction-sre.cmapi';
+Run database migrations:
+```bash
+npm run migrate
+npm run migrate:metrics
 ```
 
-## Структура проекта
-
-```
-medcal-parenteralcalc├── app/                    # Mobile app(Ruter)
-│   ├── aut)/            # Экраны авторизации
-│   ├── (ab)            # Основные экраны (tabs naiatin
-│  └──_ayout.        #Rotla
-├──cmons/           #КомпонентыReatNi
-├── utis/                # Утилиты и API клиент
-├── tyes/                #TpScrp типы
-├──servr/               #Back
-│ ├──sc/
-│   │   ├── onrlles/  # Контроллеры API
-│   │  ├──u/       # API маршруты
-│   │   ├──mddwr/   # Midleware(a, e)
-│   │   ├── srices     # Сервисы (mtics)
-│   │   └── db          # База данных (pool, mgas, schema
-│   └── env             # Конфигурация сервера└── README.md```
-
-APIEndins### Autticatin
-- `POST /api/ath/gist` - Регистрация- POST /i/ath/logi` Вход
-- `GET /ai/auth/pfil` - Получить профиль (требует auh)###Calultios
--`POST /ap/cacuatins`-Создать расчёт (опциональная uh)
--`GET/api/calculains`- Получить историю (требует au)
--`DELETE /i/culais/:i`- Удалить расчёт (требует uh)
--`DELETE//alculains` - Очиститьвсюисторию(требуетuh)#Mtics (требуетauth)- `GE/api/mtrics/summy` - Общая сводка метрик
-- `GET/api/etics/ci-ses` - Активные пользователи за час
-- `GET/ai/metics/calulaions` - Статистикарасчётов
--`GT/pi/merics/prrmace` - Метрики производительности
-- `POST/api/metic/lanup` - Очистить старые метрики
-
-## База данных
-### Основные таблицы- `users` Пользователи
--`calls` - История расчётов
-
-### Метрики опционально
--`clclatio_ric` - Метрики расчётовпочасам
--`perfrme_mr` - Производительностьопераций
--`se_actvity` - Активность пользователей
-
-## Разработка
-
-### Запуск сервера в v режиме
-
-```ba
-d rer
-npm rn v```
-
-###Запуск мобильного приложения
-
-```bsh
-pxesart
+Start the server:
+```bash
+npm run dev
 ```
 
-Затем:
-- Нажмите `i` для iOS simla
-- Нажмите `` для Anri mla
-- Сканируйте QR код в Expo Go для физического устройства
+Server will run on: http://localhost:3001
 
-## Гостевой режим
-
-Приложение поддерживает работу без регистрации:
-- ✅ Все расчёты доступны
-- ❌ История не сохраняется
-- 💡 Для сохранения истории требуется регистрация
-
-## Сборка для p
-
-###Bcknd
-
-```ah
-cd srver
-nmst
+Verify server is running:
+```bash
+curl http://localhost:3001/health
 ```
 
-###MbiApp
+### 3. Monitoring Service Setup
 
-```bsh
-#Andid
-sbild--platfrma
+Navigate to monitoring directory:
+```bash
+cd monitoring
+```
 
-#
-esuld--plafr os
-```##Tbhoo
+Install Python dependencies:
+```bash
+pip install -r requirements.txt
+```
 
-###Ntwork Erro вприложении- Убедитесь что сервер запущен Проверьте IPадресв`ilap.s`
-- Обновите `CORS_ORIGIN` в `servr.nv`
+Configure environment variables in `monitoring/.env`:
+```env
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=calculator_db
+DB_USER=postgres
+DB_PASSWORD=postgres
+```
 
-### База данных не подключается
--ПроверьтечтоPtgSQLзапущен
--Проверьтеredeials в `sevr/env` Запуститемиграции:`np r mgr`
+Start the monitoring service:
+```bash
+uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
+```
 
-### История не загружается
-- Убедитесь что пользователь авторизован
-- Проверьтечтотокенвалиден
--Проверьтелогисервера
+Monitoring service will run on: http://127.0.0.1:8000
 
-##Lice
+Verify monitoring is running:
+```bash
+curl http://127.0.0.1:8000/health
+curl http://127.0.0.1:8000/metrics
+```
+
+### 4. Prometheus and Grafana Setup
+
+Navigate to monitoring directory:
+```bash
+cd monitoring
+```
+
+Start Prometheus and Grafana with Docker Compose:
+```bash
+docker-compose up -d
+```
+
+Services will be available at:
+- Prometheus: http://localhost:9090
+- Grafana: http://localhost:3000
+
+Grafana default credentials:
+- Username: admin
+- Password: admin
+
+Stop services:
+```bash
+docker-compose down
+```
+
+View logs:
+```bash
+docker-compose logs -f
+```
+
+### 5. Mobile App Setup
+
+Navigate to project root:
+```bash
+cd ..
+```
+
+Install dependencies:
+```bash
+npm install
+```
+
+Update API URL in `utils/api.ts` with your computer's local IP:
+```typescript
+const API_BASE_URL = __DEV__
+  ? 'http://YOUR_LOCAL_IP:3001/api'  // Replace with your IP
+  : 'https://your-production-server.com/api';
+```
+
+Start the mobile app:
+```bash
+npm start
+```
+
+Or:
+```bash
+npx expo start
+```
+
+Options:
+- Press 'i' for iOS simulator
+- Press 'a' for Android emulator
+- Scan QR code with Expo Go app on physical device
+
+## Service URLs Summary
+
+### Backend
+- Server API: http://localhost:3001
+- Health check: http://localhost:3001/health
+
+### Monitoring
+- Monitoring API: http://127.0.0.1:8000
+- Metrics endpoint: http://127.0.0.1:8000/metrics
+- Health check: http://127.0.0.1:8000/health
+
+### Observability
+- Prometheus: http://localhost:9090
+- Grafana: http://localhost:3000
+  - Username: admin
+  - Password: admin
+  - Dashboard: "Medical Calculator Monitoring"
+
+### Mobile App
+- Metro bundler: http://localhost:8081
+
+## API Endpoints
+
+### Authentication
+```
+POST /api/auth/register
+POST /api/auth/login
+GET  /api/auth/profile (requires auth)
+```
+
+### Calculations
+```
+POST   /api/calculations (optional auth)
+GET    /api/calculations (requires auth)
+DELETE /api/calculations/:id (requires auth)
+DELETE /api/calculations (requires auth)
+```
+
+### Metrics
+```
+GET  /api/metrics/summary (requires auth)
+GET  /api/metrics/active-users (requires auth)
+GET  /api/metrics/calculations (requires auth)
+GET  /api/metrics/performance (requires auth)
+POST /api/metrics/cleanup (requires auth)
+```
+
+## Development Workflow
+
+1. Start PostgreSQL database
+2. Start backend server: `cd server && npm run dev`
+3. Start monitoring service: `cd monitoring && uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload`
+4. Start Prometheus/Grafana: `cd monitoring && docker-compose up -d`
+5. Start mobile app: `npm start`
+
+## Viewing Metrics
+
+1. Open Grafana: http://localhost:3000
+2. Login with admin/admin
+3. Navigate to Dashboards
+4. Select "Medical Calculator Monitoring"
+5. View real-time metrics:
+   - Total calculations by user type
+   - Average operation duration
+   - User activity
+   - Performance metrics
+
+## Troubleshooting
+
+### Database Connection Failed
+- Check PostgreSQL is running: `pg_isready`
+- Verify credentials in `.env` files
+- Run migrations: `npm run migrate`
+
+### Backend Server Not Starting
+- Check port 3001 is not in use
+- Verify database connection
+- Check logs for errors
+
+### Monitoring Service Not Starting
+- Check port 8000 is not in use
+- Verify Python dependencies installed
+- Check database connection
+
+### Prometheus Cannot Scrape Metrics
+- Ensure monitoring service is running on port 8000
+- Check `prometheus.yml` configuration
+- Verify Docker can access `host.docker.internal`
+
+### Mobile App Cannot Connect to Server
+- Update IP address in `utils/api.ts`
+- Ensure server is running on port 3001
+- Check CORS_ORIGIN in `server/.env`
+- Mobile device must be on same network
+
+### Grafana Shows No Data
+- Verify Prometheus is scraping metrics: http://localhost:9090/targets
+- Check monitoring service is running
+- Ensure database has data
+- Verify time range on dashboard
+
+## Database Schema
+
+### Main Tables
+- `users` - User accounts
+- `calculations` - Calculation history
+
+### Metrics Tables
+- `calculation_metrics` - Hourly calculation statistics
+- `performance_metrics` - Operation performance data
+- `user_activity` - User activity tracking
+
+## Production Notes
+
+Before deploying to production:
+
+1. Change all default passwords and secrets
+2. Set NODE_ENV=production
+3. Use secure HTTPS endpoints
+4. Restrict CORS to specific origins
+5. Set up proper database backups
+6. Configure firewall rules
+7. Use environment-specific .env files
+8. Enable rate limiting on API endpoints
+
+## License
 
 MIT

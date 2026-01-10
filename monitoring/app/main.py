@@ -15,11 +15,11 @@ metrics_call_count = 0
 
 @app.on_event("startup")
 async def startup():
-    print("🚀 Starting Monitoring Service...")
+    print("Starting Monitoring Service...")
     await init_db()
-    print("⏰ Starting periodic metrics collection (every 60s)...")
+    print("Starting periodic metrics collection (every 60s)...")
     asyncio.create_task(periodic_collect())
-    print("✅ Startup complete\n")
+    print("Startup complete")
 
 
 async def periodic_collect():
@@ -27,7 +27,7 @@ async def periodic_collect():
         try:
             await collect_metrics()
         except Exception as e:
-            print(f"❌ Error in periodic collection: {e}")
+            print(f"Error in periodic collection: {e}")
         await asyncio.sleep(60)
 
 
@@ -35,9 +35,7 @@ async def periodic_collect():
 def metrics():
     global metrics_call_count
     metrics_call_count += 1
-    print(f"\n🔔 /metrics endpoint called (#{metrics_call_count}) at {datetime.utcnow()}")
     result = generate_latest()
-    print(f"📤 Returning {len(result)} bytes of metrics\n")
     return Response(
         result,
         media_type=CONTENT_TYPE_LATEST
@@ -51,6 +49,5 @@ def health():
 
 @app.post("/collect-now")
 async def collect_now():
-    print("🔄 Manual metrics collection triggered")
     await collect_metrics()
     return {"status": "collected"}
