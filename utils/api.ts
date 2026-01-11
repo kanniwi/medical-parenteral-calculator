@@ -3,7 +3,7 @@ import axios from 'axios';
 
 const API_BASE_URL = __DEV__
   ? 'http://172.20.10.2:3001/api'  
-  : 'https://your-production-server.com/api';
+  : 'http://138.124.71.55/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
